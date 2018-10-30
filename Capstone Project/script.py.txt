@@ -1,0 +1,88 @@
+from trie import Trie
+from data import *
+from welcome import *
+from hashmap import HashMap
+from linkedlist import LinkedList
+
+#Printing the Welcome Message
+print_welcome()
+
+#Write code to insert food types into a data structure here. The data is in data.py
+def getFoodTypes(UserInput):
+  food_types = HashMap(len(types))
+  length = len(UserInput)
+  for foodtype in types:
+    if food_types.retrieve(foodtype[:length]):
+      ft_arr = food_types.retrieve(foodtype[:length])
+      ft_arr.append(foodtype)
+    else:
+      ft_arr = [foodtype]
+    food_types.assign(foodtype[:length],ft_arr)
+  return food_types.retrieve(UserInput)
+#Write code to insert restaurant data into a data structure here. The data is in data.py
+def getResturants(UserInput):
+  length = len(UserInput)
+  restaurants_food_types = HashMap(len(restaurant_data))
+  for restaurants in restaurant_data:
+    if restaurants_food_types.retrieve(restaurants[0][:length]):
+      r_arr = restaurants_food_types.retrieve(restaurants[0][:length])
+      restaurant_details = HashMap(len(restaurants))
+      restaurant_details.assign("food_type",restaurants[0])
+      restaurant_details.assign("restaurant_name",restaurants[1])
+      restaurant_details.assign("price",restaurants[2])
+      restaurant_details.assign("rating",restaurants[3])
+      restaurant_details.assign("address",restaurants[4])
+      r_arr.append(restaurant_details)
+    else:
+      restaurant_details = HashMap(len(restaurants))
+      restaurant_details.assign("food_type",restaurants[0])
+      restaurant_details.assign("restaurant_name",restaurants[1])
+      restaurant_details.assign("price",restaurants[2])
+      restaurant_details.assign("rating",restaurants[3])
+      restaurant_details.assign("address",restaurants[4])
+      r_arr = [restaurant_details]
+    restaurants_food_types.assign(restaurants[0][:length],r_arr)
+  return restaurants_food_types.retrieve(UserInput)
+
+def hashOnTheFly(Array,UserInput):
+  length = len(UserInput)
+  hashFly = HashMap(len(Array))
+  for item in Array:
+    if hashFly.retrieve(item[:length]):
+      hf_arr = hashFly.retrieve(item[:length])
+      hf_arr.append(item)
+    else:
+      hf_arr = [item]
+    hashFly.assign(item[:length],hf_arr)
+  return hashFly.retrieve(UserInput)
+  
+  
+#Write code for user interaction here
+while True:
+    user_input = str(input("\nWhat type of food would you like to eat?\nType the beginning (at least one letter) of that food type and press enter to see if it's here.\n")).lower()
+    #Search for user_input in food types data structure here
+    selected_food_types = getFoodTypes(user_input)
+    while selected_food_types is None:
+      user_input = str(input("\nWe have found 0 food types with your search. Enter the begining of the following:\n{0}\n".format(types))).lower()
+      selected_food_types = getFoodTypes(user_input)
+    if len(selected_food_types) == 1:
+      question = str(input("\nwe have found {0} foodtypes.Is this Correct? enter 'y' for Yes or 'n' for No.\n{1}\n".format(len(selected_food_types),selected_food_types))).lower()
+      if question == "y":
+        selected_food_type = selected_food_types[0]      
+    else:
+      UserInput = str(input("\nwe have found {0} foodtypes. Which woud you like? enter the begining of you choosen food type.\n{1}\n".format(len(selected_food_types),selected_food_types))).lower()
+      selected_food_type = hashOnTheFly(selected_food_types,UserInput)[0]
+    if question == "n":
+      print("\nSearch again:")
+    else:
+      print("\nYou have selected '{0}'. Here are the results:\n".format(selected_food_type))
+      returnedResturants = getResturants(selected_food_type)
+      print("************************************")
+      for restaurant in returnedResturants:
+        print("\nFood Type: {0}\nResturant Name: {1}\nPrice: {2}/5\nRating: {3}/5\nAddress: {4}\n\n************************************".format(restaurant.retrieve("food_type"),restaurant.retrieve("restaurant_name"),restaurant.retrieve("price"),restaurant.retrieve("rating"),restaurant.retrieve("address")))
+      print("\nSearch again:")
+
+    
+
+
+
